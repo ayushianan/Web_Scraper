@@ -1,0 +1,9 @@
+Module Coverage:
+We will be using pythons modules here:
+1.import requests-The requests module allows you to send HTTP requests using Python.
+2.from os import system-The OS module in python provides functions for interacting with the operating system. OS, comes under Python’s standard utility modules. This module provides a portable way of using operating system dependent functionality.
+3.from sys import exit-it means from module sys, take function exit.
+4.from time import sleep-The time.sleep pauses execution, making the program wait for the defined time. The time to wait (sleep) is defined in seconds.
+5.from requests.exceptions import ConnectionError-For a Connection error occurred.
+6.from bs4 import BeautifulSoup-Beautiful Soup is a Python library for pulling data out of HTML and XML files. It works with your favorite parser to provide idiomatic ways of navigating, searching, and modifying the parse tree.
+

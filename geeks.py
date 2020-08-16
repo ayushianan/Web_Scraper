@@ -1,20 +1,18 @@
 #!/usr/bin/python
 
 import requests
-
 from os import system
 from sys import exit
 from time import sleep
 from requests.exceptions import ConnectionError
-
 from bs4 import BeautifulSoup
-
 from article import Article
 
 
 BASE_URL = "https://www.geeksforgeeks.org/"
 articles = []
 
+#dictionary
 CHOICE_TO_CATEGORY_MAPPING = {
     1: "c",
     2: "c-plus-plus",
@@ -48,6 +46,7 @@ def get_category_choice():
 def save_articles_as_html_and_pdf():
     print("All links scraped, extracting articles")
     # Formatting the html for articles
+    #tuples
     all_articles = (
         "<!DOCTYPE html>"
         "<html><head>"
@@ -56,6 +55,7 @@ def save_articles_as_html_and_pdf():
         '<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>'
         "</head><body>"
     )
+    #rawgit script
 
     all_articles += (
         '<h1 style="text-align:center;font-size:40px">'
@@ -64,6 +64,7 @@ def save_articles_as_html_and_pdf():
     )
     all_articles += '<h1 style="padding-left:5%;font-size:200%;">Index</h1><br/>'
 
+    #href=# takes you to top of page
     for x in range(len(articles)):
         all_articles += (
             '<a href ="#'
@@ -79,41 +80,43 @@ def save_articles_as_html_and_pdf():
         all_articles += (
             '<hr id="' + str(x + 1) + '">' + articles[x].content.decode("utf-8")
         )
-
+    #decode to reading type for encoding in binary mode
     all_articles += """</body></html>"""
     html_file_name = "G4G_" + category_url.title() + ".html"
     html_file = open(html_file_name, "wb")
     html_file.write(all_articles.encode("utf-8"))
     html_file.close()
-
+    #html files can be viwed normally and can be open in wb mode
+    #for writing binary files
     pdf_file_name = "G4G_" + category_url.title() + ".pdf"
     print("Generating PDF " + pdf_file_name)
     html_to_pdf_command = "wkhtmltopdf " + html_file_name + " " + pdf_file_name
     system(html_to_pdf_command)
-
+    #wkhtmltopdf is able to put several objects into the output file, an object is
+    #either a single webpage, a cover webpage or a table of contents.  The objects
+    #are put into the output document in the order they are specified on the
+    #command line, options can be specified on a per object basis or in the global
+    #options area. Options from the Global Options section can only be placed in the global options area
+    #system function can execute shell commands
 
 def scrape_category(category_url):
+    #get all data oof html page
     try:
         soup = BeautifulSoup(requests.get(BASE_URL + category_url).text,"lxml")
     except ConnectionError:
         print("Couldn't connect to Internet! Please check your connection & Try again.")
         exit(1)
-
-    # Selecting links which are in the category page
     links = [a.attrs.get("href") for a in soup.select("article li a")]
-    # Removing links for the categories with anchor on same page
+    #GET ALL LIINKS
     
-    #links = [link for link in links if not link.startswith(link[0])]
-
     print("Found: " + str(len(links)) + " links")
     i = 1
 
-    # Traverse each link to find article and save it.
     for link in links:
         try:
             if i % 10 == 0:
-                sleep(5)  # Sleep for 5 seconds before scraping every 10th link
-            
+                sleep(5)  
+            #str from int to string
             if link is not None:
                 link = link.strip()
                 print("Scraping link no: " + str(i) + " Link: " + link)

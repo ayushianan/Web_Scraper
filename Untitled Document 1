@@ -1,0 +1,77 @@
+Implementation:
+1.
+Store base url as:
+BASE_URL = "https://www.geeksforgeeks.org/"
+
+2.
+Scrape the contents of base ppage and linked pages:
+try:
+ soup = BeautifulSoup(requests.get(BASE_URL + category_url).text,"lxml")
+except ConnectionError:
+ print("Couldn't connect to Internet! Please check your connection & Try again.")
+  exit(1)
+links = [a.attrs.get("href") for a in soup.select("article li a")]
+link_soup = BeautifulSoup(requests.get(link).text)
+
+
+3.
+Clean the web pages and store them in encoded form:
+[script.extract() for script in link_soup(["script", "ins"])]
+for code_tag in link_soup.find_all("pre"):
+code_tag["class"] = code_tag.get("class", []) + ["prettyprint"]
+article = link_soup.find("article")
+page = Article(title=link_soup.title.string, content=article.encode("UTF-8"))
+articles.append(page)
+
+4.
+Form initial of web page:
+---all_articles = (
+        "<!DOCTYPE html>"
+        "<html><head>"
+        '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'
+        '<link rel="stylesheet" href="style.min.css" type="text/css" media="all" />'
+        '<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>'
+        "</head><body>"
+    )
+    #rawgit script
+
+    all_articles += (
+        '<h1 style="text-align:center;font-size:40px">'
+        + category_url.title()
+        + " Archive</h1><hr>"
+    )
+    all_articles += '<h1 style="padding-left:5%;font-size:200%;">Index</h1><br/>'
+
+---for x in range(len(articles)):
+        all_articles += (
+            '<a href ="#'
+            + str(x + 1)
+            + '">'
+            + '<h1 style="padding-left:5%;font-size:20px;">'
+            + str(x + 1)
+            + ".\t\t"
+            + articles[x].title
+            + "</h1></a> <br/>"
+        )
+
+5.
+Get content from respective links and write to html page opened in wb format:
+all_articles += """</body></html>"""
+    html_file_name = "G4G_" + category_url.title() + ".html"
+    html_file = open(html_file_name, "wb")
+    html_file.write(all_articles.encode("utf-8"))
+    html_file.close()
+
+6.
+Convert html page into pdf:
+wkhtmltopdf is able to put several objects into the output file, an object is
+either a single webpage, a cover webpage or a table of contents.  The objects
+are put into the output document in the order they are specified on the
+command line, options can be specified on a per object basis or in the global
+options area. Options from the Global Options section can only be placed in the global options area
+---pdf_file_name = "G4G_" + category_url.title() + ".pdf"
+    print("Generating PDF " + pdf_file_name)
+    html_to_pdf_command = "wkhtmltopdf " + html_file_name + " " + pdf_file_name
+    system(html_to_pdf_command)
+
+
